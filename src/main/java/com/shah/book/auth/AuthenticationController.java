@@ -33,4 +33,17 @@ public class AuthenticationController {
     public List<String> getJobsName(){
         return List.of("one","two");
     }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest authenticationRequest){
+        return ResponseEntity.ok(service.authenticate(authenticationRequest)) ;
+    }
+
+    @GetMapping("/activate-token")
+    public ResponseEntity<?> confirm(
+            @RequestParam String token
+    ) throws MessagingException {
+        service.activateAccount(token);
+        return ResponseEntity.accepted().build();
+    }
 }

@@ -32,7 +32,7 @@ spring:
 application:
   security:
     jwt:
-      secret-key: shah
+      secret-key: C6ED2FBA2BB86DCDD979B78485A61C6ED2FBA2BB86DCDD979B78485A61C6ED2FBA2BB86DCDD979B78485A61
       expiration: 8640000
   mailing:
     frontend:
