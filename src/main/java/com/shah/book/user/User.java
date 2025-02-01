@@ -1,5 +1,7 @@
 package com.shah.book.user;
 
+import com.shah.book.book.Book;
+import com.shah.book.history.BookTransactionHistory;
 import com.shah.book.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "_user")
@@ -41,6 +44,12 @@ public class User implements UserDetails, Principal {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHistory> histories;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

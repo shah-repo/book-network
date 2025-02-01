@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "auditorAware") // It only works for 2 fields like for @CreatedDate, @LastModifiedDate.
 @EnableAsync
 public class BookNetworkApiApplication {
 
