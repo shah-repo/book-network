@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.shah.book.book.BookSpecification.withOwnerId;
+
 @Service
 @RequiredArgsConstructor
 public class BookService {
@@ -41,6 +43,26 @@ public class BookService {
         List<BookResponse> bookResponseList = books.stream()
                 .map(BookMapper::toBookResponse)
                 .toList();
+        return new PageResponse<>(
+                bookResponseList,
+                books.getNumber(),
+                books.getSize(),
+                books.getTotalPages(),
+                books.getNumberOfElements(),
+                books.isFirst(),
+                books.isLast()
+        );
+    }
+
+    public PageResponse<BookResponse> findAllBooksByOwner(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        //Using Specification, we need to extend JpaSpecificationExecutor<Book> also in book Repo interface otherwise won't work.
+        Page<Book> books = bookRepository.findAll(withOwnerId(user.getId()),pageable);
+        List<BookResponse> bookResponseList = books.stream()
+                .map(BookMapper::toBookResponse)
+                .toList();
+
         return new PageResponse<>(
                 bookResponseList,
                 books.getNumber(),
