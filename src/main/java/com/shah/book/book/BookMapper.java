@@ -1,5 +1,6 @@
 package com.shah.book.book;
 
+import com.shah.book.history.BookTransactionHistory;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,17 @@ public class BookMapper {
 //                .cover()
                 .build();
 
+    }
+
+    public static BorrowedBookResponse toBorrowedBookResponse(BookTransactionHistory history) {
+        return BorrowedBookResponse.builder()
+                .id(history.getBook().getId())
+                .title(history.getBook().getTitle())
+                .authorName(history.getBook().getAuthorName())
+                .isbn(history.getBook().getIsbn())
+                .rate(history.getBook().getRate())
+                .returned(history.isReturned())
+                .returnApproved(history.isReturnApproved())
+                .build();
     }
 }
