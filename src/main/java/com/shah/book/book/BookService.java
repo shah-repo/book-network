@@ -127,4 +127,16 @@ public class BookService {
 
         return bookRepository.save(book).getId();
     }
+
+    public Integer updateArchivedStatus(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the Id:: " + bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(),user.getId())){
+            throw new OperationNotPermittedException("You are not the owner of this book,You can't update archived status of this book with Id::"+bookId);
+        }
+        book.setShareable(!book.isArchived());
+
+        return bookRepository.save(book).getId();
+    }
 }
