@@ -135,7 +135,7 @@ public class BookService {
         if (!Objects.equals(book.getOwner().getId(),user.getId())){
             throw new OperationNotPermittedException("You are not the owner of this book,You can't update archived status of this book with Id::"+bookId);
         }
-        book.setShareable(!book.isArchived());
+        book.setArchived(!book.isArchived());
 
         return bookRepository.save(book).getId();
     }
