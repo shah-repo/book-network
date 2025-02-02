@@ -1,5 +1,6 @@
 package com.shah.book.book;
 
+import com.shah.book.file.FileUtils;
 import com.shah.book.history.BookTransactionHistory;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().fullName())
-//                Todo implement it later
-//                .cover()
+                .cover(FileUtils.readFileFromLocation(book.getBookCover()))
                 .build();
 
     }
