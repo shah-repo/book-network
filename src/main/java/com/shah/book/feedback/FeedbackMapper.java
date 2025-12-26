@@ -1,9 +1,11 @@
 package com.shah.book.feedback;
 
 import com.shah.book.book.Book;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+@Service
 public class FeedbackMapper {
     public static FeedbackResponse  toFeedbackResponse(Feedback feedback, Integer userId) {
         return FeedbackResponse.builder()

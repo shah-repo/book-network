@@ -19,6 +19,13 @@ public interface BookTransactionHistoryRepository extends JpaRepository<BookTran
             SELECT history
             FROM BookTransactionHistory history
             WHERE history.book.owner.id = :userId
+            """)
+    Page<BookTransactionHistory> findAllLendedBooks(Pageable pageable, Integer userId);
+
+    @Query("""
+            SELECT history
+            FROM BookTransactionHistory history
+            WHERE history.book.owner.id = :userId
             AND history.returned = true
             """)
     Page<BookTransactionHistory> findAllReturnedBooks(Pageable pageable, Integer userId);
@@ -33,6 +40,15 @@ public interface BookTransactionHistoryRepository extends JpaRepository<BookTran
     boolean isAlreadyBorrowedByUser(Integer bookId, Integer userId);
 
     @Query("""
+            SELECT (COUNT(*)>0) AS isBorrowed
+            FROM BookTransactionHistory history
+            WHERE history.book.id = :bookId
+            AND history.returned = false
+            AND history.returnApproved = false
+            """)
+    boolean isAlreadyBorrowed(Integer bookId);
+
+    @Query("""
             SELECT history
             FROM BookTransactionHistory history
             WHERE history.book.id = :bookId
@@ -40,7 +56,7 @@ public interface BookTransactionHistoryRepository extends JpaRepository<BookTran
             AND history.returned = false
             AND history.returnApproved = false
             """)
-    Optional<BookTransactionHistory> findByBookIdAndUserId(Integer bookId, Integer id);
+    Optional<BookTransactionHistory> findByBookIdAndUserId(Integer bookId, Integer userId);
 
     @Query("""
             SELECT history
@@ -50,5 +66,5 @@ public interface BookTransactionHistoryRepository extends JpaRepository<BookTran
             AND history.returned = true
             AND history.returnApproved = false
             """)
-    Optional<BookTransactionHistory> findByBookIdAndOwnerId(Integer bookId, Integer id);
+    Optional<BookTransactionHistory> findByBookIdAndOwnerId(Integer bookId, Integer userId);
 }

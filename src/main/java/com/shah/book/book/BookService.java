@@ -138,8 +138,15 @@ public class BookService {
         if (!Objects.equals(book.getOwner().getId(), user.getId())) {
             throw new OperationNotPermittedException("You are not the owner of this book,You can't update archived status of this book with Id::" + bookId);
         }
-        book.setArchived(!book.isArchived());
 
+        boolean isArchived = !book.isArchived();
+        if (isArchived){
+            final boolean isAlreadyBorrowed = transactionHistoryRepo.isAlreadyBorrowed(bookId);
+            if (isAlreadyBorrowed){
+                throw new OperationNotPermittedException("You can't archived, the book is not yet returned!");
+            }
+        }
+        book.setArchived(isArchived);
         return bookRepository.save(book).getId();
     }
 
@@ -195,8 +202,8 @@ public class BookService {
         }
 
         User user = ((User) connectedUser.getPrincipal());
-        if (Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You can't borrow or return your own book");
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You can't borrow or return other's book");
         }
         BookTransactionHistory bookTransactionHistory = transactionHistoryRepo.findByBookIdAndOwnerId(bookId, user.getId())
                 .orElseThrow(() -> new OperationNotPermittedException("You didn't borrow this book, since you can't return either"));
@@ -213,5 +220,24 @@ public class BookService {
         var bookCover = fileStorageService.saveFile(file, user.getId());
         book.setBookCover(bookCover);
         bookRepository.save(book);
+    }
+
+    public PageResponse<BorrowedBookResponse> findAllLendedBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<BookTransactionHistory> lendedBooks = transactionHistoryRepo.findAllLendedBooks(pageable, user.getId());
+        List<BorrowedBookResponse> bookResponseList = lendedBooks.stream()
+                .map(BookMapper::toBorrowedBookResponse)
+                .toList();
+
+        return new PageResponse<>(
+                bookResponseList,
+                lendedBooks.getNumber(),
+                lendedBooks.getSize(),
+                lendedBooks.getTotalPages(),
+                lendedBooks.getNumberOfElements(),
+                lendedBooks.isFirst(),
+                lendedBooks.isLast()
+        );
     }
 }
