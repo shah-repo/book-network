@@ -32,8 +32,27 @@ public class BookService {
 
     public Integer save(BookRequest bookRequest, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
-        Book book = bookMapper.toBook(bookRequest);
-        book.setOwner(user);
+
+        Book book;
+        Integer bookId = bookRequest.id();
+
+        if (bookId != null) {
+            // Update
+            book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new EntityNotFoundException("No book found with the Id:: " + bookId));
+
+            book.setTitle(bookRequest.title());
+            book.setAuthorName(bookRequest.authorName());
+            book.setSynopsis(bookRequest.synopsis());
+            book.setIsbn(bookRequest.isbn());
+            book.setShareable(bookRequest.shareable());
+
+        } else {
+            // Create
+            book = bookMapper.toBook(bookRequest);
+            book.setOwner(user);
+        }
+
         return bookRepository.save(book).getId();
     }
 
